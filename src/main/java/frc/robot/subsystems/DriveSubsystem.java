@@ -7,14 +7,21 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
+import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 
+import javax.swing.GrayFilter;
+
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.TalonFXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -27,12 +34,10 @@ public class DriveSubsystem extends SubsystemBase {
 
     private WPI_TalonFX lFrontMotor = new WPI_TalonFX(Constants.Drivetrain.LEFT_FRONT_MOTOR);
     private WPI_TalonFX lRearMotor = new WPI_TalonFX(Constants.Drivetrain.LEFT_REAR_MOTOR);
-    private MotorControllerGroup lMotors = new MotorControllerGroup(lFrontMotor, lRearMotor);
     private TalonFXSimCollection lSim = lFrontMotor.getSimCollection();
 
     private WPI_TalonFX rFrontMotor = new WPI_TalonFX(Constants.Drivetrain.RIGHT_FRONT_MOTOR);
     private WPI_TalonFX rRearMotor = new WPI_TalonFX(Constants.Drivetrain.RIGHT_REAR_MOTOR);
-    private MotorControllerGroup rMotors = new MotorControllerGroup(rFrontMotor, rRearMotor);
     private TalonFXSimCollection rSim = rFrontMotor.getSimCollection();
 
     private AHRS gyro = new AHRS(SPI.Port.kMXP);
@@ -41,21 +46,33 @@ public class DriveSubsystem extends SubsystemBase {
     private DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TRACK_WIDTH);
 
     private DifferentialDrivetrainSim sim = new DifferentialDrivetrainSim(DCMotor.getFalcon500(2), Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO, 
-        Constants.Drivetrain.Sim.JKG_M2, Constants.Drivetrain.Sim.ROBOT_MASS, Constants.Drivetrain.WHEEL_CIRCUMFERENCE/1000, Constants.Drivetrain.TRACK_WIDTH, null);
+        Constants.Drivetrain.Sim.JKG_M2, Constants.Drivetrain.Sim.ROBOT_MASS, Constants.Drivetrain.WHEEL_CIRCUMFERENCE, Constants.Drivetrain.TRACK_WIDTH, null);
 
     private DifferentialDriveOdometry odometry; 
 
-    private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(Constants.Drivetrain.RIGHT_kS, Constants.Drivetrain.RIGHT_kV);
-    private SimpleMotorFeedforward rfeedforward = new SimpleMotorFeedforward(Constants.Drivetrain.RIGHT_kS, Constants.Drivetrain.RIGHT_kV);
-    private SimpleMotorFeedforward lfeedforward = new SimpleMotorFeedforward(Constants.Drivetrain.LEFT_kS, Constants.Drivetrain.LEFT_kV);
-    private SimpleMotorFeedforward lfeedbackward = new SimpleMotorFeedforward(Constants.Drivetrain.LEFT_BACKWARD_kS, Constants.Drivetrain.LEFT_BACKWARD_kV);
+    private SimpleMotorFeedforward rFeedforward = new SimpleMotorFeedforward(Constants.Drivetrain.RIGHT_kS, Constants.Drivetrain.RIGHT_kV);
+    private SimpleMotorFeedforward lFeedforward = new SimpleMotorFeedforward(Constants.Drivetrain.LEFT_kS, Constants.Drivetrain.LEFT_kV);
 
     private Field2d field = new Field2d();
 
     public DriveSubsystem() {
+
+        /* Reset motors */
+        lFrontMotor.configFactoryDefault();
+        lRearMotor.configFactoryDefault();
+        rFrontMotor.configFactoryDefault();
+        lRearMotor.configFactoryDefault();
+
+
         /* Right motors are inverted because they're facing the other way, fix that */
-        lMotors.setInverted(false);
-        rMotors.setInverted(true);
+        lFrontMotor.setInverted(false);
+        lRearMotor.setInverted(InvertType.FollowMaster);
+        rFrontMotor.setInverted(true);
+        rRearMotor.setInverted(InvertType.FollowMaster);
+
+        lRearMotor.follow(lFrontMotor);
+        rRearMotor.follow(rFrontMotor);
+
         
         /* Set up gyro simulation */
         int dev = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
@@ -95,35 +112,49 @@ public class DriveSubsystem extends SubsystemBase {
 
     /* Encoder related functions */
     public double getRightPos() {
-        double meanEncoderVal = (rFrontMotor.getSelectedSensorPosition() + rRearMotor.getSelectedSensorPosition()) / 2; // average of right side native encoder units
-        double rotations = meanEncoderVal / Constants.Drivetrain.TALON_UNITS_PER_ROTATION;                       // convert native units to rotations
+        double encoderVal = rFrontMotor.getSelectedSensorPosition();
+        double rotations = encoderVal / Constants.Drivetrain.TALON_UNITS_PER_ROTATION;                           // convert native units to rotations
         double wheelRotations = rotations / Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO;                      // convert rotations of motor shaft to rotations of wheel
         double linearDisplacement = wheelRotations * Constants.Drivetrain.WHEEL_CIRCUMFERENCE;                   // convert wheel rotations to linear displacement
         return linearDisplacement;
     }
 
     public double getLeftPos(){
-        double meanEncoderVal = (lFrontMotor.getSelectedSensorPosition() + lRearMotor.getSelectedSensorPosition()) / 2; // average of right side native encoder units
-        double rotations = meanEncoderVal / Constants.Drivetrain.TALON_UNITS_PER_ROTATION;                       // convert native units to rotations
+        double encoderVal = lFrontMotor.getSelectedSensorPosition();
+        double rotations = encoderVal / Constants.Drivetrain.TALON_UNITS_PER_ROTATION;                           // convert native units to rotations
         double wheelRotations = rotations / Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO;                      // convert rotations of motor shaft to rotations of wheel
         double linearDisplacement = wheelRotations * Constants.Drivetrain.WHEEL_CIRCUMFERENCE;                   // convert wheel rotations to linear displacement
         return linearDisplacement;
     }
 
     public double getRightVel(){
-        double meanEncoderVal = (rFrontMotor.getSelectedSensorVelocity() + rRearMotor.getSelectedSensorVelocity()) / 2; // average of right side native encoder units
-        double rotations = meanEncoderVal / Constants.Drivetrain.TALON_UNITS_PER_ROTATION;                       // convert native units to rotations
+        double encoderVal = rFrontMotor.getSelectedSensorPosition();
+        double rotations = encoderVal / Constants.Drivetrain.TALON_UNITS_PER_ROTATION;                           // convert native units to rotations
         double wheelRotations = rotations / Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO;                      // convert rotations of motor shaft to rotations of wheel
         double linearDisplacement = wheelRotations * Constants.Drivetrain.WHEEL_CIRCUMFERENCE;                   // convert wheel rotations to linear displacement
-        return linearDisplacement;
+        return linearDisplacement * 10;                                                                          // convert m/100ms to m/s
     }
 
     public double getLeftVel(){
-        double meanEncoderVal = (lFrontMotor.getSelectedSensorVelocity() + lRearMotor.getSelectedSensorVelocity()) / 2; // average of right side native encoder units
-        double rotations = meanEncoderVal / Constants.Drivetrain.TALON_UNITS_PER_ROTATION;                       // convert native units to rotations
+        double encoderVal = lFrontMotor.getSelectedSensorPosition();
+        double rotations = encoderVal / Constants.Drivetrain.TALON_UNITS_PER_ROTATION;                           // convert native units to rotations
         double wheelRotations = rotations / Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO;                      // convert rotations of motor shaft to rotations of wheel
         double linearDisplacement = wheelRotations * Constants.Drivetrain.WHEEL_CIRCUMFERENCE;                   // convert wheel rotations to linear displacement
-        return linearDisplacement;
+        return linearDisplacement * 10;                                                                          // convert m/100ms to m/s
+    }
+
+    /** Sets motor speeds */
+    public void setSpeeds(DifferentialDriveWheelSpeeds speeds) {
+        double leftSpeed = lFeedforward.calculate(speeds.leftMetersPerSecond);
+        double rightSpeed = rFeedforward.calculate(speeds.rightMetersPerSecond);
+
+        lFrontMotor.setVoltage(MathUtil.clamp(leftSpeed, -12, 12));
+        rFrontMotor.setVoltage(MathUtil.clamp(rightSpeed, -12, 12));
+    }
+
+    public void drive(double xSpeed, double rot) {
+        var wheelSpeeds = kinematics.toWheelSpeeds(new ChassisSpeeds(xSpeed, 0.0, rot));
+        setSpeeds(wheelSpeeds);
     }
 
     /**
@@ -131,6 +162,17 @@ public class DriveSubsystem extends SubsystemBase {
      */
     @Override
     public void periodic() {
+
+        SmartDashboard.putNumber("Drivetrain/REncoderPos", rFrontMotor.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Drivetrain/REncoderVel", rFrontMotor.getSelectedSensorVelocity());
+        SmartDashboard.putNumber("Drivetrain/RPos", getRightPos());
+
+        SmartDashboard.putNumber("Drivetrain/LEncoderPos", lFrontMotor.getSelectedSensorPosition());
+        SmartDashboard.putNumber("Drivetrain/LEncoderVel", lFrontMotor.getSelectedSensorVelocity());
+        SmartDashboard.putNumber("Drivetrain/LPos", getLeftPos());
+
+        SmartDashboard.putNumber("Drivetrain/Heading", gyro.getRotation2d().getDegrees());
+
         odometry.update(gyro.getRotation2d(), getLeftPos(), getRightPos());
         field.setRobotPose(odometry.getPoseMeters());
     }
@@ -153,9 +195,16 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void simulationPeriodic() {
 
+        /* Pass the robot battery voltage to the simulated Talon FXs */
+        lSim.setBusVoltage(RobotController.getBatteryVoltage());
+        rSim.setBusVoltage(RobotController.getBatteryVoltage());
+
         // Set outputs, motor inputs, inverting the right (setInverted doesn't work here).
+        SmartDashboard.putNumber("Drivetrain/Sim/LMotorOutputLeadVoltage", lSim.getMotorOutputLeadVoltage());
+        SmartDashboard.putNumber("Drivetrain/Sim/RMotorOutputLeadVoltage", rSim.getMotorOutputLeadVoltage());
+
         sim.setInputs(lSim.getMotorOutputLeadVoltage(),
-        -rSim.getMotorOutputLeadVoltage());
+            -rSim.getMotorOutputLeadVoltage());
 
         /* Advance the model by 20ms */
         sim.update(0.02);
@@ -178,6 +227,7 @@ public class DriveSubsystem extends SubsystemBase {
                 -sim.getRightVelocityMetersPerSecond()
         ));
 
+        simAngle.set(-sim.getHeading().getDegrees());
 
     }
 }

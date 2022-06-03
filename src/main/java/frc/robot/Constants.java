@@ -27,9 +27,6 @@ public final class Constants {
         public static double LEFT_kV = 2.977147245265187;
         public static double LEFT_kS = 0.5;
 
-        public static double LEFT_BACKWARD_kV = 3.248834213489218;
-        public static double LEFT_BACKWARD_kS = 0.077369;
-
         public static double TALON_UNITS_PER_ROTATION = 2048;
         public static double SHAFT_TO_WHEEL_GEAR_RATIO = 12.75;
         public static double WHEEL_CIRCUMFERENCE = 8 * 0.0254 * Math.PI; // 4in wheel?
