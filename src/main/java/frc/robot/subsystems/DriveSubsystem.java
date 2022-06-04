@@ -16,6 +16,7 @@ import edu.wpi.first.math.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.math.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.math.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
+import edu.wpi.first.math.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.SPI;
 
@@ -97,8 +98,11 @@ public class DriveSubsystem extends SubsystemBase {
         odometry = new DifferentialDriveOdometry(gyro.getRotation2d(), new Pose2d(0, 0, new Rotation2d(0)));
 
         /* Reset simulation */
-        sim = new DifferentialDrivetrainSim(DCMotor.getFalcon500(2), Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO, 
-            Constants.Drivetrain.Sim.JKG_M2, Constants.Drivetrain.Sim.ROBOT_MASS, Constants.Drivetrain.WHEEL_CIRCUMFERENCE, Constants.Drivetrain.TRACK_WIDTH, null);
+        //sim = new DifferentialDrivetrainSim(DCMotor.getFalcon500(2), Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO, 
+        //    Constants.Drivetrain.Sim.JKG_M2, Constants.Drivetrain.Sim.ROBOT_MASS, Constants.Drivetrain.WHEEL_CIRCUMFERENCE, Constants.Drivetrain.TRACK_WIDTH, null);
+        
+        var drivetrain = LinearSystemId.identifyDrivetrainSystem(Constants.Drivetrain.Sim.LINEAR_KV, Constants.Drivetrain.Sim.LINEAR_KA, Constants.Drivetrain.Sim.ANGULAR_KV, Constants.Drivetrain.Sim.ANGULAR_KA);
+        sim  = new DifferentialDrivetrainSim(drivetrain, DCMotor.getFalcon500(2), Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO, Constants.Drivetrain.TRACK_WIDTH, Constants.Drivetrain.WHEEL_RADIUS, null);
     }
 
     /**
