@@ -45,8 +45,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     private DifferentialDriveKinematics kinematics = new DifferentialDriveKinematics(Constants.Drivetrain.TRACK_WIDTH);
 
-    private DifferentialDrivetrainSim sim = new DifferentialDrivetrainSim(DCMotor.getFalcon500(2), Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO, 
-        Constants.Drivetrain.Sim.JKG_M2, Constants.Drivetrain.Sim.ROBOT_MASS, Constants.Drivetrain.WHEEL_CIRCUMFERENCE, Constants.Drivetrain.TRACK_WIDTH, null);
+    private DifferentialDrivetrainSim sim;
 
     private DifferentialDriveOdometry odometry; 
 
@@ -96,6 +95,10 @@ public class DriveSubsystem extends SubsystemBase {
         gyro.reset();
         /* Reset our position */
         odometry = new DifferentialDriveOdometry(gyro.getRotation2d(), new Pose2d(0, 0, new Rotation2d(0)));
+
+        /* Reset simulation */
+        sim = new DifferentialDrivetrainSim(DCMotor.getFalcon500(2), Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO, 
+            Constants.Drivetrain.Sim.JKG_M2, Constants.Drivetrain.Sim.ROBOT_MASS, Constants.Drivetrain.WHEEL_CIRCUMFERENCE, Constants.Drivetrain.TRACK_WIDTH, null);
     }
 
     /**
