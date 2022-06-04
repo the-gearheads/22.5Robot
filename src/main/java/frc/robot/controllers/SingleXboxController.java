@@ -1,6 +1,10 @@
 package frc.robot.controllers;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants;
 
 public class SingleXboxController implements ControllerInterface {
 
@@ -11,11 +15,11 @@ public class SingleXboxController implements ControllerInterface {
     }
 
     public double getMoveAxis() {
-        return controller.getLeftY();
+        return MathUtil.applyDeadband(controller.getLeftY(), Constants.Controllers.DRIVE_DEADBAND);
     }
 
     public double getRotateAxis() {
-        return controller.getRightX();
+        return MathUtil.applyDeadband(controller.getRightX(), Constants.Controllers.ROTATE_DEADBAND);
     }
-    
+
 }

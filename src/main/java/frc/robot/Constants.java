@@ -33,10 +33,18 @@ public final class Constants {
 
         public static class Sim {
             // 100% incorrect, need to find out in cad
-            public static double JKG_M2 = 2.1;
-            // Roughly, need to verify, in kg
-            public static double ROBOT_MASS = 75;
+            public static double JKG_M2 = 5;
+            // in kg
+            public static double ROBOT_MASS = 56;
         }
 
+    }
+
+    public static class Controllers {
+        public static double DRIVE_DEADBAND = 0.08;
+        public static double ROTATE_DEADBAND = 0.08;
+
+        public static double DEFAULT_DRIVE_SPEED = 2;
+        public static double DEFAULT_ROT_SPEED = 2.2;
     }
 }
