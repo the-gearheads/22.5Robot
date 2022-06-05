@@ -41,8 +41,8 @@ public class Constants {
             public static final double LINEAR_KV = 1.9817;
             public static final double LINEAR_KA = 0.3182;
 
-            public static final double ANGULAR_KV = 16.79;
-            public static final double ANGULAR_KA = 0.89482;
+            public static final double ANGULAR_KV = 1.79;
+            public static final double ANGULAR_KA = 0.69482;
         }
 
     }
