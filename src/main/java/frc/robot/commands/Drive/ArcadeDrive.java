@@ -20,7 +20,7 @@ public class ArcadeDrive extends CommandBase {
 
     }
 
-    // Called when the command is initially scheduled.
+    /** Reset the drivetrain when initialized */
     @Override
     public void initialize() {
         drive.setNeutralMode(NeutralMode.Brake);
@@ -30,14 +30,14 @@ public class ArcadeDrive extends CommandBase {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        moveSpeed = NetworkTableInstance.getDefault().getTable("/SmartDashboard/ArcadeDrive").getEntry("moveSpeed").getNumber(Constants.Controllers.DEFAULT_DRIVE_SPEED).doubleValue();
-        rotateSpeed = NetworkTableInstance.getDefault().getTable("/SmartDashboard/ArcadeDrive").getEntry("rotateSpeed").getNumber(Constants.Controllers.DEFAULT_ROT_SPEED).doubleValue();
+
+        // Set moveSpeed and rotateSpeed from dashboard, and update it. 
+        moveSpeed = SmartDashboard.getNumber("ArcadeDrive/moveSpeed", Constants.Controllers.DEFAULT_DRIVE_SPEED);
+        rotateSpeed = SmartDashboard.getNumber("ArcadeDrive/rotateSpeed", Constants.Controllers.DEFAULT_ROT_SPEED);
 
         SmartDashboard.putNumber("ArcadeDrive/moveSpeed", moveSpeed);
         SmartDashboard.putNumber("ArcadeDrive/rotateSpeed", rotateSpeed);
-
-
-
+        
         drive.drive(-Controllers.activeController.getMoveAxis() * moveSpeed, -Controllers.activeController.getRotateAxis() * rotateSpeed);
     }
 
