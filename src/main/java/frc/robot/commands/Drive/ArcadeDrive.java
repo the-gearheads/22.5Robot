@@ -25,6 +25,10 @@ public class ArcadeDrive extends CommandBase {
     public void initialize() {
         drive.setNeutralMode(NeutralMode.Brake);
         drive.zeroEncoders();
+
+        /* Add our values to networktables so they can be set */
+        SmartDashboard.putNumber("ArcadeDrive/moveSpeed", Constants.Controllers.DEFAULT_DRIVE_SPEED);
+        SmartDashboard.putNumber("ArcadeDrive/rotateSpeed", Constants.Controllers.DEFAULT_ROT_SPEED);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -34,9 +38,6 @@ public class ArcadeDrive extends CommandBase {
         // Set moveSpeed and rotateSpeed from dashboard, and update it. 
         moveSpeed = SmartDashboard.getNumber("ArcadeDrive/moveSpeed", Constants.Controllers.DEFAULT_DRIVE_SPEED);
         rotateSpeed = SmartDashboard.getNumber("ArcadeDrive/rotateSpeed", Constants.Controllers.DEFAULT_ROT_SPEED);
-
-        SmartDashboard.putNumber("ArcadeDrive/moveSpeed", moveSpeed);
-        SmartDashboard.putNumber("ArcadeDrive/rotateSpeed", rotateSpeed);
         
         drive.drive(-Controllers.activeController.getMoveAxis() * moveSpeed, -Controllers.activeController.getRotateAxis() * rotateSpeed);
     }
