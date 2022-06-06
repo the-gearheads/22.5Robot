@@ -4,7 +4,14 @@
 
 package frc.robot;
 
-import edu.wpi.first.wpilibj.TimedRobot;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedNetworkTables;
+import org.littletonrobotics.junction.io.ByteLogReceiver;
+import org.littletonrobotics.junction.io.ByteLogReplay;
+import org.littletonrobotics.junction.io.LogSocketServer;
+
+import edu.wpi.first.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -14,7 +21,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -28,6 +35,33 @@ public class Robot extends TimedRobot {
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
+    initAdvantageKit();
+
+  }
+
+  private void initAdvantageKit() {
+    // Don't run if logging is disabled. 
+    if(!Constants.ENABLE_LOGGING) return;
+
+    // Setup AdvantageKit logging
+    setUseTiming(Constants.getMode() != Constants.RunMode.REPLAY); // Use timing, unless we're in replay mode, so replays go at full speed. 
+    LoggedNetworkTables.getInstance().addTable("/SmartDashboard"); // Log /SmartDashboard
+    
+    // Setup logging and playback locations
+    switch (Constants.getMode()) {
+      case REAL:
+        Logger.getInstance().addDataReceiver(new ByteLogReceiver("/media/sda1/")); // Log to USB stick (name will be selected automatically)
+      case SIMULATED: // Fall-through is intentional
+        Logger.getInstance().addDataReceiver(new LogSocketServer(5800));
+         break;
+      case REPLAY:
+        String path = ByteLogReplay.promptForPath(); // Prompt the user for a file path on the command line
+        Logger.getInstance().setReplaySource(new ByteLogReplay(path)); // Read log file for replay
+        Logger.getInstance().addDataReceiver(new ByteLogReceiver(ByteLogReceiver.addPathSuffix(path, "_sim"))); // Save replay results to a new log with the "_sim" suffix
+        break;
+    }
+
+    Logger.getInstance().start(); // Start logging!
   }
 
   /**
@@ -93,4 +127,9 @@ public class Robot extends TimedRobot {
   /** This function is called periodically during test mode. */
   @Override
   public void testPeriodic() {}
+
+  /** This function is called periodically during simulation. */
+  @Override
+  public void simulationPeriodic() {}
+  
 }

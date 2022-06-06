@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.RobotBase;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants. This class should not be used for any other purpose. All constants should be declared
@@ -13,6 +15,28 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public class Constants {
+
+    /* Whether to replay or simulate when launched as a simulation */
+    public static boolean ENABLE_REPLAY = false;
+    
+    /* Whether to enable logging with AdvantageKit */
+    public static boolean ENABLE_LOGGING = false;
+
+    /** Returns whether the code is real, simulated, or being replayed */
+    public static RunMode getMode() {
+        if (RobotBase.isReal()) {
+            return RunMode.REAL;
+        } else if (ENABLE_REPLAY) {
+            return RunMode.REPLAY;
+        } else {
+            return RunMode.SIMULATED;
+        }
+    } 
+
+    public static enum RunMode {
+        REAL, SIMULATED, REPLAY
+    }
+
     public static class Drivetrain {
         public static final int RIGHT_FRONT_MOTOR = 4;
         public static final int RIGHT_REAR_MOTOR = 5;

@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.Drive.ArcadeDrive;
 import frc.robot.controllers.Controllers;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -21,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
   private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
 
   //private final ArcadeDrive m_arcadeDrive = new ArcadeDrive(m_driveSubsystem);
