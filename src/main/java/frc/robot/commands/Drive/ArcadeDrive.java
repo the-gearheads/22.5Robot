@@ -1,13 +1,10 @@
 package frc.robot.commands.Drive;
 
-import com.ctre.phoenix.motorcontrol.NeutralMode;
-
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.controllers.Controllers;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.drive.DriveSubsystem;
 
 public class ArcadeDrive extends CommandBase {
     private DriveSubsystem drive;
@@ -23,7 +20,7 @@ public class ArcadeDrive extends CommandBase {
     /** Reset the drivetrain when initialized */
     @Override
     public void initialize() {
-        drive.setNeutralMode(NeutralMode.Brake);
+        drive.setBrakeMode(true);
         drive.zeroEncoders();
 
         /* Add our values to networktables so they can be set */

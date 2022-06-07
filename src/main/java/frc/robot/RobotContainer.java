@@ -8,7 +8,10 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.commands.Drive.ArcadeDrive;
 import frc.robot.controllers.Controllers;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.drive.DriveIO;
+import frc.robot.subsystems.drive.DriveIORobot;
+import frc.robot.subsystems.drive.DriveIOSim;
+import frc.robot.subsystems.drive.DriveSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -20,12 +23,23 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
-  private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
+  private DriveSubsystem m_driveSubsystem;
 
   //private final ArcadeDrive m_arcadeDrive = new ArcadeDrive(m_driveSubsystem);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    switch(Constants.getMode()) {
+      case REAL:
+        m_driveSubsystem = new DriveSubsystem(new DriveIORobot());
+        break;
+      case SIMULATED:
+        m_driveSubsystem = new DriveSubsystem(new DriveIOSim());
+        break;
+      case REPLAY:
+        m_driveSubsystem = new DriveSubsystem(new DriveIO() {});
+        break;
+    }
   }
 
   /**
