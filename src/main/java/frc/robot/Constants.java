@@ -20,7 +20,7 @@ public class Constants {
     public static boolean ENABLE_REPLAY = false;
     
     /* Whether to enable logging with AdvantageKit */
-    public static boolean ENABLE_LOGGING = false;
+    public static boolean ENABLE_LOGGING = true;
 
     /** Returns whether the code is real, simulated, or being replayed */
     public static RunMode getMode() {

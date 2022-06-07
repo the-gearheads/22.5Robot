@@ -13,11 +13,12 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.commands.Drive.ArcadeDrive;
 import frc.robot.subsystems.drive.DriveIO.DriveIOInputs;
 
 public class DriveSubsystem extends SubsystemBase {
 
-    Field2d field;
+    Field2d field = new Field2d();
     
     DriveIO drive;
     DriveIOInputs inputs = new DriveIOInputs();
@@ -31,6 +32,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     public DriveSubsystem(DriveIO io) {
         drive = io;
+
+        setDefaultCommand(new ArcadeDrive(this));
+
         // Call updateInputs once before we zero encoders so the gyro heading is set
         drive.updateInputs(inputs); 
 
