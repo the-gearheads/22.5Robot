@@ -64,14 +64,8 @@
     }
   },
   "NetworkTables": {
-    "FMSInfo": {
-      "open": true
-    },
     "LiveWindow": {
       ".status": {
-        "open": true
-      },
-      "DriveSubsystem": {
         "open": true
       },
       "ExampleSubsystem": {
@@ -86,9 +80,9 @@
         },
         "navX-Sensor[4]": {
           "open": true
-        }
-      },
-      "open": true
+        },
+        "open": true
+      }
     },
     "SmartDashboard": {
       "ArcadeDrive": {
@@ -101,9 +95,6 @@
         "Sim": {
           "open": true
         },
-        "open": true
-      },
-      "Field": {
         "open": true
       },
       "open": true

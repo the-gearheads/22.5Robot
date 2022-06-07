@@ -51,7 +51,10 @@ public class Robot extends LoggedRobot {
     switch (Constants.getMode()) {
       case REAL:
         Logger.getInstance().addDataReceiver(new ByteLogReceiver("/media/sda1/")); // Log to USB stick (name will be selected automatically)
-      case SIMULATED: // Fall-through is intentional
+        Logger.getInstance().addDataReceiver(new LogSocketServer(5800));
+        break;
+      case SIMULATED:
+        Logger.getInstance().addDataReceiver(new ByteLogReceiver("./logs/"));
         Logger.getInstance().addDataReceiver(new LogSocketServer(5800));
          break;
       case REPLAY:
