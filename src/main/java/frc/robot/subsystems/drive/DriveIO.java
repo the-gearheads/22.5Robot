@@ -4,6 +4,7 @@ import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public interface DriveIO {
     public static class DriveIOInputs implements LoggableInputs {
@@ -21,15 +22,20 @@ public interface DriveIO {
 
         public void toLog(LogTable table) {
             table.put("RightPos", rightPos);
+            SmartDashboard.putNumber("Drivetrain/RightPos", rightPos);
             table.put("RightVelocity", rightVelocity);
+            SmartDashboard.putNumber("Drivetrain/RightVelocity", rightVelocity);
 
             table.put("LeftPos", leftPos);
+            SmartDashboard.putNumber("Drivetrain/LeftPos", leftPos);
             table.put("LeftVelocity", leftVelocity);
+            SmartDashboard.putNumber("Drivetrain/LeftVelocity", leftVelocity);
 
             table.put("LeftVolts", appliedLeftVolts);
             table.put("RightVolts", appliedRightVolts);
 
             table.put("HeadingDegrees", heading.getDegrees());
+            SmartDashboard.putNumber("Drivetrain/Heading", heading.getDegrees());
         }
 
         public void fromLog(LogTable table) {
