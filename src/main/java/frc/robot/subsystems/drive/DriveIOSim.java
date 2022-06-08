@@ -23,7 +23,7 @@ public class DriveIOSim extends DriveIORobot {
             Constants.Drivetrain.Sim.ANGULAR_KA
         );
 
-        sim  = new DifferentialDrivetrainSim(drivetrain, DCMotor.getFalcon500(2),
+        sim = new DifferentialDrivetrainSim(drivetrain, DCMotor.getFalcon500(2),
             Constants.Drivetrain.SHAFT_TO_WHEEL_GEAR_RATIO,
             Constants.Drivetrain.TRACK_WIDTH, Constants.Drivetrain.WHEEL_RADIUS, null
         );

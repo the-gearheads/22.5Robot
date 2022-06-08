@@ -17,6 +17,9 @@ public interface DriveIO {
 
         public double appliedLeftVolts;
         public double appliedRightVolts;
+
+        public double rightEncoderPos;
+        public double leftEncoderPos;
         
         public Rotation2d heading;
 
@@ -36,6 +39,9 @@ public interface DriveIO {
 
             table.put("HeadingDegrees", heading.getDegrees());
             SmartDashboard.putNumber("Drivetrain/Heading", heading.getDegrees());
+
+            table.put("LEncoderPos", leftEncoderPos);
+            table.put("REncoderPos", rightEncoderPos);
         }
 
         public void fromLog(LogTable table) {
@@ -49,6 +55,9 @@ public interface DriveIO {
             appliedRightVolts = table.getDouble("RightVolts", appliedRightVolts);
 
             heading = Rotation2d.fromDegrees(table.getDouble("HeadingDegrees", 0));
+
+            rightEncoderPos = table.getDouble("REncoderPos", rightEncoderPos);
+            leftEncoderPos = table.getDouble("LEncoderPos", leftEncoderPos);
         }
     }
 

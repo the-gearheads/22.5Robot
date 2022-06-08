@@ -60,7 +60,7 @@ public class Robot extends LoggedRobot {
       case REPLAY:
         String path = ByteLogReplay.promptForPath(); // Prompt the user for a file path on the command line
         Logger.getInstance().setReplaySource(new ByteLogReplay(path)); // Read log file for replay
-        Logger.getInstance().addDataReceiver(new ByteLogReceiver(ByteLogReceiver.addPathSuffix(path, "_sim"))); // Save replay results to a new log with the "_sim" suffix
+        Logger.getInstance().addDataReceiver(new ByteLogReceiver(path.substring(0, path.length()-5) + "_sim.rlog")); // Save replay results to a new log with the "_sim" suffix
         break;
     }
 

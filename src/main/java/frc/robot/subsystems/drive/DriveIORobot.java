@@ -58,6 +58,9 @@ public class DriveIORobot implements DriveIO {
             
             inputs.appliedRightVolts = rFrontMotor.getMotorOutputVoltage();
             inputs.appliedLeftVolts = lFrontMotor.getMotorOutputVoltage();
+
+            inputs.rightEncoderPos = rFrontMotor.getSelectedSensorPosition();
+            inputs.leftEncoderPos = lFrontMotor.getSelectedSensorPosition();
         }
 
         public void setVoltages(double leftVoltage, double rightVoltage) {
