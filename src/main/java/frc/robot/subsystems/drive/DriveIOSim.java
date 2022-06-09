@@ -42,12 +42,15 @@ public class DriveIOSim extends DriveIORobot {
 
     @Override
     public void zeroEncoders() {
-        super.zeroEncoders();
 
         /* Also reset the simulation so the physics don't carry over in a reset.
          * Just for convienence, probably makes it less accurate in some edge case.
          */
         initSim();
+
+        updateInputs(new DriveIOInputs());
+
+        super.zeroEncoders();
     }
 
     /** Converts meters to native units */
